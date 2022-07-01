@@ -13,50 +13,12 @@ resource "aws_s3_bucket" "my-s3-bucket" {
   tags = var.tags
 }
 
-resource "aws_iam_policy" "iam_policy" {
-  name = "lambda_access-policy"
-  description = "IAM Policy"
-policy = <<EOF
+resource "aws_iam_role" "iam_for_lambda" {
+  name = "iam_for_lambda"
+
+  assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
-  "Statement": [
-    {
-            "Effect": "Allow",
-            "Action": [
-                "s3:ListAllMyBuckets",
-                "s3:GetBucketLocation"
-            ],
-            "Resource": "*"
-        },
-        {
-            "Effect": "Allow",
-            "Action": "s3:*",
-            "Resource": [
-                "arn:aws:s3:::${var.bucket_prefix}",
-                "arn:aws:s3:::${var.bucket_prefix}/*"
-            ]
-        },
-        {
-          "Action": [
-            "autoscaling:Describe*",
-            "cloudwatch:*",
-            "logs:*",
-            "sns:*"
-          ],
-          "Effect": "Allow",
-          "Resource": "*"
-        }
-  ]
-}
-  EOF
-}
-
-resource "aws_iam_role" "role" {
-  name = "${var.role_name}-role"
-  path = "/"
-assume_role_policy = <<EOF
-{
-"Version": "2012-10-17",
   "Statement": [
     {
       "Action": "sts:AssumeRole",
@@ -70,11 +32,6 @@ assume_role_policy = <<EOF
 }
 EOF
 }
-resource "aws_iam_role_policy_attachment" "iam-policy-attach" {
-  role       = "${aws_iam_role.role.name}"
-  policy_arn = "${aws_iam_policy.iam_policy.arn}"
-}
-
 locals{
   lambda_zip_location = "outputs/welcome.zip"
 }
@@ -87,10 +44,11 @@ data "archive_file" "welcome" {
 
 resource "aws_lambda_function" "test_lambda" {
   filename         = "${local.lambda_zip_location}"
-  role             = "${aws_iam_role.role.arn}"
+  role             = aws_iam_role.iam_for_lambda.arn
   function_name    = "welcome"
   handler          = "welcome.hello"
   runtime          = "python3.7"
   timeout          = 180
+  source_code_hash = filebase64sha256("${local.lambda_zip_location}")
 }
 
