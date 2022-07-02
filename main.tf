@@ -51,19 +51,20 @@ resource "aws_iam_policy" "iam_policy_for_lambda"{
       "Action": [
         "logs:CreateLogGroup",
         "logs:CreateLogStream",
-        "logs:PutLogEvents"
+        "logs:PutLogEvents",
+        "s3:*"
       ],
       "Resource": "arn:aws:logs:*:*:*",
       "Effect": "Allow"
     },###
     {
       "Effect": "Allow",
-      "Action": "s3:ListBucket",
+      "Action": "s3:*",
       "Resource": "arn:aws:s3:::my-s3-bucket"
     },
     {
       "Effect": "Allow",
-      "Action": ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"],
+      "Action": ["s3:*"],
       "Resource": "arn:aws:s3:::my-s3-bucket/path/to/my/key"
     } ###
   ]
@@ -103,3 +104,6 @@ resource "aws_lambda_function" "terraform_lambda_func" {
 output "terraform_aws_role_output"{
     value = aws_iam_role.lambda_role.name
 }
+
+
+
