@@ -1,3 +1,10 @@
+terraform {
+  backend "s3" {
+    bucket = "my-s3-bucket"
+    key    = "path/to/my/key"
+    region = "ap-south-1"
+  }
+}
 provider "aws" {
   region = var.aws_region
 }
@@ -104,6 +111,3 @@ resource "aws_lambda_function" "terraform_lambda_func" {
 output "terraform_aws_role_output"{
     value = aws_iam_role.lambda_role.name
 }
-
-
-
