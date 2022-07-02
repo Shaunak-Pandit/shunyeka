@@ -13,6 +13,12 @@ resource "aws_s3_bucket" "my-s3-bucket" {
   tags = var.tags
 }
 
+resource "aws_s3_bucket_object" "function" {
+  bucket = module.my-s3-bucket.id
+  key    = "hello-python.zip"
+  source = data.archive_file.terraform_lambda_func.output_path
+}
+
 resource "aws_iam_role" "lambda_role" {
   name = "terraform_aws_lambda_role"
 
@@ -83,6 +89,10 @@ resource "aws_lambda_function" "terraform_lambda_func" {
   handler          = "hello-python.lambda_handler"
   runtime          = "python3.8"
   depends_on       = [aws_iam_role_policy_attachment.attach_iam_policy_to_iam_role] 
+  ##
+  s3_bucket = aws_s3_bucket_object.function.bucket
+  s3_key    = aws_s3_bucket_object.function.key
+  ##
   environment {
     variables = {
       foo = "bar"
@@ -93,6 +103,3 @@ resource "aws_lambda_function" "terraform_lambda_func" {
 output "terraform_aws_role_output"{
     value = aws_iam_role.lambda_role.name
 }
-
-
-
