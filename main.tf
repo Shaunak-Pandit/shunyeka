@@ -3,6 +3,8 @@ terraform {
     bucket = "my-s3-bucket"
     key    = "path/to/my/key"
     region = "ap-south-1"
+    access_key = "AKIA3WIQTEQNEMYFXI6J"
+    secret_key = "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"
   }
 }
 provider "aws" {
@@ -99,7 +101,8 @@ resource "aws_lambda_function" "terraform_lambda_func" {
   depends_on       = [aws_iam_role_policy_attachment.attach_iam_policy_to_iam_role] 
   environment {
     variables = {
-      foo = "bar"
+      s3_bucket = aws_s3_bucket_object.function.bucket
+      s3_key    = aws_s3_bucket_object.function.key
     }
   }
 }
@@ -107,3 +110,6 @@ resource "aws_lambda_function" "terraform_lambda_func" {
 output "terraform_aws_role_output"{
     value = aws_iam_role.lambda_role.name
 }
+
+
+
