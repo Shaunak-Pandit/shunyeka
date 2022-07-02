@@ -3,9 +3,7 @@ terraform {
     bucket = "my-s3-bucket"
     key    = "path/to/my/key"
     region = "ap-south-1"
-    access_key = "AKIA3WIQTEQNEMYFXI6J"
-    secret_key = "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"
-  }
+  }  
 }
 provider "aws" {
   region = var.aws_region
