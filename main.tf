@@ -49,7 +49,17 @@ resource "aws_iam_policy" "iam_policy_for_lambda"{
       ],
       "Resource": "arn:aws:logs:*:*:*",
       "Effect": "Allow"
-    }
+    },###
+    {
+      "Effect": "Allow",
+      "Action": "s3:ListBucket",
+      "Resource": "arn:aws:s3:::my-s3-bucket"
+    },
+    {
+      "Effect": "Allow",
+      "Action": ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"],
+      "Resource": "arn:aws:s3:::my-s3-bucket/path/to/my/key"
+    } ###
   ]
 }
 EOF  
@@ -73,8 +83,16 @@ resource "aws_lambda_function" "terraform_lambda_func" {
   handler          = "hello-python.lambda_handler"
   runtime          = "python3.8"
   depends_on       = [aws_iam_role_policy_attachment.attach_iam_policy_to_iam_role] 
+  environment {
+    variables = {
+      foo = "bar"
+    }
+  }
 }
 
 output "terraform_aws_role_output"{
     value = aws_iam_role.lambda_role.name
 }
+
+
+
