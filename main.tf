@@ -1,9 +1,11 @@
 terraform {
   backend "s3" {
     bucket = "my-s3-bucket"
-    key    = "path/to/my/key"
+    key    = "my-s3-bucket/key"
     region = "ap-south-1"
-  }  
+    access_key = "AKIA3WIQTEQNEMYFXI6J"
+    secret_key = "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"
+  }
 }
 provider "aws" {
   region = var.aws_region
@@ -88,7 +90,7 @@ resource "aws_lambda_function" "terraform_lambda_func" {
   handler          = "hello-python.lambda_handler"
   runtime          = "python3.8"
   depends_on       = [aws_iam_role_policy_attachment.attach_iam_policy_to_iam_role] 
-  kms_key_arn      = "${path/to/my/key}.arn"
+  kms_key_arn      = "${path.module/my-s3-bucket/key}.arn"
 
 output "terraform_aws_role_output"{
     value = aws_iam_role.lambda_role.name
